@@ -23,6 +23,7 @@ type Request struct {
 type PaymentRequestParameters struct {
 	Amount            int     `json:"amount"`
 	Currency          string  `json:"currency"`
+	Lang              string  `json:"lang"`
 	MerchantID        int     `json:"merchant_id"`
 	OrderDesc         string  `json:"order_desc"`
 	OrderID           string  `json:"order_id"`
@@ -39,8 +40,8 @@ type PaymentRequestParameters struct {
 func (c Client) GenerateSignature(p PaymentRequestParameters) string {
 	sig := sha1.New()
 
-	sigString := fmt.Sprintf("%s|%d|%s|%d|%s|%s", c.Password, p.Amount, p.Currency,
-		p.MerchantID, p.OrderDesc, p.OrderID)
+	sigString := fmt.Sprintf("%s|%d|%s|%s|%d|%s|%s", c.Password, p.Amount, p.Currency,
+		p.Lang, p.MerchantID, p.OrderDesc, p.OrderID)
 
 	// TODO upgrade it somehow
 	if p.Rectoken != nil {
