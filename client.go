@@ -11,6 +11,7 @@ import (
 
 type Client struct {
 	MerchantID int
+	Password   string
 }
 
 // Request is an wrapper for PaymentRequestParameters, needed for payment creation request
@@ -32,13 +33,14 @@ type PaymentRequestParameters struct {
 	Signature         string  `json:"signature"`
 }
 
-// Signature generates payment signature needed for authenticating the payment.
-// The user is supposed to use GenerateSignature before requesting payment
+// GenerateSignature generates payment signature needed for authenticating the payment.
+// The user is supposed to generate signature for payment request
 // TODO tests
-func (p *PaymentRequestParameters) GenerateSignature() {
+func (c Client) GenerateSignature(p PaymentRequestParameters) string {
 	sig := sha1.New()
 
-	sigString := fmt.Sprintf("test|%d|%s|%d|%s|%s", p.Amount, p.Currency, p.MerchantID, p.OrderDesc, p.OrderID)
+	sigString := fmt.Sprintf("%s|%d|%s|%d|%s|%s", c.Password, p.Amount, p.Currency,
+		p.MerchantID, p.OrderDesc, p.OrderID)
 
 	// TODO upgrade it somehow
 	if p.Rectoken != nil {
@@ -55,7 +57,7 @@ func (p *PaymentRequestParameters) GenerateSignature() {
 	}
 
 	fmt.Fprint(sig, sigString)
-	p.Signature = hex.EncodeToString(sig.Sum(nil))
+	return hex.EncodeToString(sig.Sum(nil))
 }
 
 type Response struct {
